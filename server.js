@@ -3,11 +3,12 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const dotenv = require('dotenv').config(); // Load environment variables
-const swaggerJsDoc = require('swagger-jsdoc');
+
 const swaggerUi = require('swagger-ui-express');
 const pool = require('./config/database');
 const cookieParser = require("cookie-parser");
 const userRoute = require('./routes/useRoutes');
+const swaggerOptions = require('./config/swagger');
 
 
 
@@ -21,21 +22,7 @@ app.use(cookieParser());
 app.use(express.urlencoded({extended: false}));
 app.use(cors());
 app.use(bodyParser.json());
-
-// Swagger documentation setup
-const swaggerOptions = {
-  swaggerDefinition: {
-    info: {
-      title: 'Food Delivery API',
-      version: '1.0.0',
-      description: 'API documentation for the Food Delivery App',
-    },
-    servers: [{ url: `http://localhost:${port}` }],
-  },
-  apis: ['./routes/*.js'], // Specify route files for Swagger documentation
-};
-const swaggerDocs = swaggerJsDoc(swaggerOptions);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerOptions));
 
 //Routes Middleware
 
