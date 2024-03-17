@@ -2,20 +2,25 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const dotenv = require('dotenv');
+const dotenv = require('dotenv').config(); // Load environment variables
 const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
+const pool = require('./config/database');
+const cookieParser = require("cookie-parser");
+const userRoute = require('./routes/useRoutes');
 
-// Load environment variables
-dotenv.config();
+
 
 // Initialize Express app
 const app = express();
 const port = process.env.PORT || 3000;
 
 // Middleware setup
-app.use(bodyParser.json());
+app.use(express.json());
+app.use(cookieParser());
+app.use(express.urlencoded({extended: false}));
 app.use(cors());
+app.use(bodyParser.json());
 
 // Swagger documentation setup
 const swaggerOptions = {
@@ -32,14 +37,11 @@ const swaggerOptions = {
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
-// Routes setup
-// const organizationRoutes = require('./routes/organizationRoutes');
-// const itemRoutes = require('./routes/itemRoutes');
-// const pricingRoutes = require('./routes/pricingRoutes');
+//Routes Middleware
 
-// app.use('/api/organizations', organizationRoutes);
-// app.use('/api/items', itemRoutes);
-// app.use('/api/pricing', pricingRoutes);
+app.use("/api", userRoute)
+
+
 
 // Default route
 app.get('/', (req, res) => {
@@ -49,10 +51,11 @@ app.get('/', (req, res) => {
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
+  console.log(err.message);
   res.status(500).send('Something went wrong!');
 });
 
 // Start server
 app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+  console.log(`Server running on port http://localhost:${port}`);
 });
